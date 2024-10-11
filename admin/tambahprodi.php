@@ -71,7 +71,7 @@ if(isset($_POST['simpan'])){
               <span class="nav-profile-name"><?= $_SESSION['nama_admin'] ?></span>
             </a>
             <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="profileDropdown">
-              <a class="dropdown-item">
+              <a class="dropdown-item" href="logout.php">
                 <i class="typcn typcn-eject text-primary"></i>
                 Logout
               </a>
