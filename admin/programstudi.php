@@ -13,6 +13,18 @@ if($_SESSION['status'] != 'login'){
 
 }
 
+if(isset($_GET['hal']) == "hapus"){
+
+  $hapus = mysqli_query($koneksi, "DELETE FROM prodi WHERE id = '$_GET[id]'");
+
+  if($hapus){
+      echo "<script>
+      alert('Hapus data sukses!');
+      document.location='programstudi.php';
+      </script>";
+  }
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -134,8 +146,8 @@ if($_SESSION['status'] != 'login'){
                           <td><?= $data['kode'] ?></td>
                           <td><?= $data['prodi'] ?></td>
                           <td>
-                            <a class="btn btn-warning" href="#">Edit</a>
-                            <a class="btn btn-danger" href="#">Hapus</a>
+                            <a class="btn btn-warning" href="editprogramstudi.php?hal=edit&id=<?= $data['id'] ?>">Edit</a>
+                            <a class="btn btn-danger" href="programstudi.php?hal=hapus&id=<?= $data['id'] ?>" onclick="return confirm('Apakah Anda Yakin Ingin Menghapus Data?')">Hapus</a>
                           </td>
                         </tr>
                         <?php

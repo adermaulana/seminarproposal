@@ -13,6 +13,40 @@ if($_SESSION['status'] != 'login'){
 
 }
 
+
+if(isset($_GET['hal'])){
+    if($_GET['hal'] == "edit"){
+        $tampil = mysqli_query($koneksi, "SELECT * FROM prodi WHERE id = '$_GET[id]'");
+        $data = mysqli_fetch_array($tampil);
+        if($data){
+            $id = $data['id'];
+            $kode = $data['kode'];
+            $prodi = $data['prodi'];
+        }
+    }
+}
+
+//Perintah Mengubah Data
+if (isset($_POST['simpan'])) {
+    // Update data pelanggan
+    $simpan = mysqli_query($koneksi, "UPDATE prodi SET
+                                        kode = '$_POST[kode]',
+                                        prodi = '$_POST[prodi]'
+                                      WHERE id = '$_GET[id]'");
+
+    if ($simpan) {
+        echo "<script>
+                alert('Edit data sukses!');
+                document.location='programstudi.php';
+              </script>";
+    } else {
+        echo "<script>
+                alert('Edit data Gagal!');
+                document.location='programstudi.php';
+              </script>";
+    }
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -21,7 +55,7 @@ if($_SESSION['status'] != 'login'){
   <!-- Required meta tags -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>Admin</title>
+  <title>PolluxUI Admin</title>
   <!-- base:css -->
   <link rel="stylesheet" href="../assets/vendors/typicons/typicons.css">
   <link rel="stylesheet" href="../assets/vendors/css/vendor.bundle.base.css">
@@ -104,41 +138,31 @@ if($_SESSION['status'] != 'login'){
         </ul>
       </nav>
       <!-- partial -->
-      <div class="main-panel">
+      <div class="main-panel">        
         <div class="content-wrapper">
           <div class="row">
-            <div class="col-md-12">
+            <div class="col-md-6 grid-margin stretch-card">
               <div class="card">
-                <h3>Daftar Mahasiswa Pendaftar Seminar Proposal Terkini</h3>
-                <div class="table-responsive pt-3">
-                  <table class="table table-striped project-orders-table">
-                    <thead>
-                      <tr>
-                        <th class="ms-5">No</th>
-                        <th>Judul Proposal</th>
-                        <th>Tanggal Pengajuan</th>
-                        <th>Pembimbing</th>
-                        <th>Status	</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>1</td>
-                        <td>Machine Learning</td>
-                        <td>12-12-2012</td>
-                        <td>Dosen</td>
-                        <td>Diterima</td>
-                      </tr>
-                    </tbody>
-                  </table>
+                <div class="card-body">
+                  <h4 class="card-title">Tambah Prodi</h4>
+                  <form class="forms-sample" method="POST">
+                    <div class="form-group">
+                      <label for="kode">Kode</label>
+                      <input type="text" class="form-control" name="kode" id="kode" value="<?= $kode ?>" placeholder="Kode" required>
+                    </div>
+                    <div class="form-group">
+                      <label for="prodi">Program Studi</label>
+                      <input type="text" class="form-control" name="prodi" id="prodi" value="<?= $prodi ?>" placeholder="Program Studi" required>
+                    </div>
+                    <button type="submit" name="simpan" class="btn btn-primary me-2">Submit</button>
+                  </form>
                 </div>
               </div>
             </div>
           </div>
-
         </div>
         <!-- content-wrapper ends -->
-        <!-- partial:partials/_footer.html -->
+        <!-- partial:../../partials/_footer.html -->
         <footer class="footer">
             <div class="card">
                 <div class="card-body">
