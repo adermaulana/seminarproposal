@@ -15,12 +15,12 @@ if($_SESSION['status'] != 'login'){
 
 if(isset($_GET['hal']) == "hapus"){
 
-  $hapus = mysqli_query($koneksi, "DELETE FROM prodi WHERE id = '$_GET[id]'");
+  $hapus = mysqli_query($koneksi, "DELETE FROM mahasiswa WHERE id = '$_GET[id]'");
 
   if($hapus){
       echo "<script>
       alert('Hapus data sukses!');
-      document.location='programstudi.php';
+      document.location='mahasiswa.php';
       </script>";
   }
 }
@@ -51,8 +51,6 @@ if(isset($_GET['hal']) == "hapus"){
     <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
       <div class="navbar-brand-wrapper d-flex justify-content-center">
         <div class="navbar-brand-inner-wrapper d-flex justify-content-between align-items-center w-100">
-          <a class="navbar-brand brand-logo" href="index.php"><img src="../assets/images/logo.svg" alt="logo"/></a>
-          <a class="navbar-brand brand-logo-mini" href="index.php"><img src="../assets/images/logo-mini.svg" alt="logo"/></a>
           <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
             <span class="typcn typcn-th-menu"></span>
           </button>
@@ -91,21 +89,33 @@ if(isset($_GET['hal']) == "hapus"){
             </a>
           </li>                                    
           <li class="nav-item">
-            <a class="nav-link" href="#">
+            <a class="nav-link" href="mahasiswa.php">
               <i class="typcn typcn-device-desktop menu-icon"></i>
-              <span class="menu-title">Kelola Seminar</span>
+              <span class="menu-title">Mahasiswa</span>
             </a>
           </li>                                    
           <li class="nav-item">
-            <a class="nav-link" href="#">
+            <a class="nav-link" href="dosen.php">
+              <i class="typcn typcn-device-desktop menu-icon"></i>
+              <span class="menu-title">Dosen</span>
+            </a>
+          </li>                                    
+          <li class="nav-item">
+            <a class="nav-link" href="proposal.php">
+              <i class="typcn typcn-device-desktop menu-icon"></i>
+              <span class="menu-title">Proposal</span>
+            </a>
+          </li>                                    
+          <li class="nav-item">
+            <a class="nav-link" href="jadwal.php">
+              <i class="typcn typcn-device-desktop menu-icon"></i>
+              <span class="menu-title">Jadwal Seminar</span>
+            </a>
+          </li>                                                                      
+          <li class="nav-item">
+            <a class="nav-link" href="laporan.php">
               <i class="typcn typcn-device-desktop menu-icon"></i>
               <span class="menu-title">Laporan</span>
-            </a>
-          </li>                                    
-          <li class="nav-item">
-            <a class="nav-link" href="programstudi.php">
-              <i class="typcn typcn-device-desktop menu-icon"></i>
-              <span class="menu-title">Kelola Program Studi</span>
             </a>
           </li>                                    
           <li class="nav-item">
@@ -123,38 +133,49 @@ if(isset($_GET['hal']) == "hapus"){
             <div class="col-lg-12 grid-margin stretch-card">
               <div class="card">
                 <div class="card-body">
-                  <h4 class="card-title">Program Studi</h4>
-                    <a class="btn btn-success mb-2" href="tambahprodi.php">Tambah Data</a>
+                  <h4 class="card-title">Mahasiswa</h4>
+                    <a class="btn btn-success mb-2" href="tambahmahasiswa.php">Tambah Data</a>
                   <div class="table-responsive">
-                    <table class="table">
-                      <thead>
-                        <tr>
-                          <th>No</th>
-                          <th>Kode</th>
-                          <th>Program Studi</th>
-                          <th>Aksi</th>
-                        </tr>
-                      </thead>
-                      <tbody>
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th>No</th>
+                        <th>NIM</th>
+                        <th>Nama</th>
+                        <th>Email</th>
+                        <th>Jurusan</th>
+                        <th>Tanggal Daftar</th>
+                        <th>Aksi</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                    <?php
+                          $no = 1;
+                          $tampil = mysqli_query($koneksi, "SELECT * FROM mahasiswa ORDER BY created_at DESC");
+                          while($data = mysqli_fetch_array($tampil)):
+                      ?>
+                      <tr>
+                        <td><?= $no++ ?></td>
+                        <td><?= $data['nim'] ?></td>
+                        <td><?= $data['nama'] ?></td>
+                        <td><?= $data['email'] ?></td>
+                        <td><?= $data['jurusan'] ?></td>
+                        <td><?= date('d-m-Y H:i', strtotime($data['created_at'])) ?></td>
+                        <td>
+                          <a class="btn btn-warning" href="editmahasiswa.php?hal=edit&nim=<?= $data['nim'] ?>">
+                            <i class="fas fa-edit"></i> Edit
+                          </a>
+                          <a class="btn btn-danger" href="mahasiswa.php?hal=hapus&nim=<?= $data['nim'] ?>" 
+                            onclick="return confirm('Apakah Anda yakin ingin menghapus data mahasiswa ini?')">
+                            <i class="fas fa-trash"></i> Hapus
+                          </a>
+                        </td>
+                      </tr>
                       <?php
-                            $no = 1;
-                            $tampil = mysqli_query($koneksi, "SELECT * FROM prodi");
-                            while($data = mysqli_fetch_array($tampil)):
-                        ?>
-                        <tr>
-                          <td><?= $no ?></td>
-                          <td><?= $data['kode'] ?></td>
-                          <td><?= $data['prodi'] ?></td>
-                          <td>
-                            <a class="btn btn-warning" href="editprogramstudi.php?hal=edit&id=<?= $data['id'] ?>">Edit</a>
-                            <a class="btn btn-danger" href="programstudi.php?hal=hapus&id=<?= $data['id'] ?>" onclick="return confirm('Apakah Anda Yakin Ingin Menghapus Data?')">Hapus</a>
-                          </td>
-                        </tr>
-                        <?php
-                            endwhile; 
-                        ?>
-                      </tbody>
-                    </table>
+                          endwhile;
+                      ?>
+                    </tbody>
+                  </table>
                   </div>
                 </div>
               </div>

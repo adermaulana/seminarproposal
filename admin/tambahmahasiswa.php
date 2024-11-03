@@ -13,6 +13,41 @@ if($_SESSION['status'] != 'login'){
 
 }
 
+
+if(isset($_POST['bsimpan'])) {
+  // Persiapan simpan data
+  $nim = mysqli_real_escape_string($koneksi, $_POST['nim']);
+  $nama = mysqli_real_escape_string($koneksi, $_POST['nama']);
+  $email = mysqli_real_escape_string($koneksi, $_POST['email']);
+  $jurusan = mysqli_real_escape_string($koneksi, $_POST['jurusan']);
+  $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+
+  // Cek apakah NIM sudah ada
+  $cek = mysqli_query($koneksi, "SELECT nim FROM mahasiswa WHERE nim = '$nim'");
+  if(mysqli_num_rows($cek) > 0) {
+      echo "<script>
+              alert('NIM sudah terdaftar!');
+              document.location='tambahmahasiswa.php';
+           </script>";
+  } else {
+      // Query insert data
+      $simpan = mysqli_query($koneksi, "INSERT INTO mahasiswa (nim, nama, email, jurusan, password) 
+                                       VALUES ('$nim', '$nama', '$email', '$jurusan', '$password')");
+      
+      if($simpan) {
+          echo "<script>
+                  alert('Simpan data sukses!');
+                  document.location='mahasiswa.php';
+               </script>";
+      } else {
+          echo "<script>
+                  alert('Simpan data GAGAL!!');
+                  document.location='tambahmahasiswa.php';
+               </script>";
+      }
+  }
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -98,7 +133,7 @@ if($_SESSION['status'] != 'login'){
               <i class="typcn typcn-device-desktop menu-icon"></i>
               <span class="menu-title">Jadwal Seminar</span>
             </a>
-          </li>                                                                      
+          </li>                                                                       
           <li class="nav-item">
             <a class="nav-link" href="laporan.php">
               <i class="typcn typcn-device-desktop menu-icon"></i>
@@ -114,54 +149,60 @@ if($_SESSION['status'] != 'login'){
         </ul>
       </nav>
       <!-- partial -->
-      <div class="main-panel">
-        <div class="content-wrapper">
-          <div class="row">
-            <div class="col-md-12">
-              <div class="card">
-                <h3 class="mt-3 ms-3">Jadwal Seminar Terdekat</h3>
-                <div class="table-responsive pt-3">
-                  <table class="table table-striped project-orders-table">
-                    <thead>
-                      <tr>
-                        <th>No</th>
-                        <th>Tanggal</th>
-                        <th>Waktu</th>
-                        <th>Mahasiswa</th>
-                        <th>Judul</th>
-                        <th>Ruangan</th>
-                        <th>Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>1</td>
-                        <td>Machine Learning</td>
-                        <td>12-12-2012</td>
-                        <td>Dosen</td>
-                        <td>Diterima</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
+      <div class="main-panel">        
+          <div class="content-wrapper">
+              <div class="row">
+                  <div class="col-md-6 grid-margin stretch-card">
+                      <div class="card">
+                          <div class="card-body">
+                              <h4 class="card-title">Tambah Mahasiswa</h4>
+                              <form class="forms-sample" method="POST">
+                                  <div class="form-group">
+                                      <label for="nim">NIM</label>
+                                      <input type="text" class="form-control" name="nim" id="nim" placeholder="Masukkan NIM" required>
+                                  </div>
+                                  <div class="form-group">
+                                      <label for="nama">Nama Lengkap</label>
+                                      <input type="text" class="form-control" name="nama" id="nama" placeholder="Masukkan Nama Lengkap" required>
+                                  </div>
+                                  <div class="form-group">
+                                      <label for="email">Email</label>
+                                      <input type="email" class="form-control" name="email" id="email" placeholder="Masukkan Email" required>
+                                  </div>
+                                  <div class="form-group">
+                                      <label for="jurusan">Jurusan</label>
+                                      <select class="form-control" name="jurusan" id="jurusan" required>
+                                          <option value="">Pilih Jurusan</option>
+                                          <option value="Teknik Informatika">Teknik Informatika</option>
+                                          <option value="Sistem Informasi">Sistem Informasi</option>
+                                          <option value="Teknik Komputer">Teknik Komputer</option>
+                                      </select>
+                                  </div>
+                                  <div class="form-group">
+                                      <label for="password">Password</label>
+                                      <input type="password" class="form-control" name="password" id="password" placeholder="Masukkan Password" required>
+                                  </div>
+                                  <button type="submit" name="bsimpan" class="btn btn-primary me-2">Submit</button>
+                                  <a href="mahasiswa.php" class="btn btn-light">Cancel</a>
+                              </form>
+                          </div>
+                      </div>
+                  </div>
               </div>
-            </div>
           </div>
-
-        </div>
-        <!-- content-wrapper ends -->
-        <!-- partial:partials/_footer.html -->
-        <footer class="footer">
-            <div class="card">
-                <div class="card-body">
-                    <div class="d-sm-flex justify-content-center justify-content-sm-between">
-                        <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">Copyright © 2024 <a href="https://www.bootstrapdash.com/" class="text-muted" target="_blank">Bootstrapdash</a>. All rights reserved.</span>
-                        <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center text-muted">Hand-crafted & made with <i class="typcn typcn-heart-full-outline text-danger"></i></span>
-                    </div>
-                </div>    
-            </div>        
-        </footer>
-        <!-- partial -->
+          <!-- content-wrapper ends -->
+          <!-- partial:../../partials/_footer.html -->
+          <footer class="footer">
+              <div class="card">
+                  <div class="card-body">
+                      <div class="d-sm-flex justify-content-center justify-content-sm-between">
+                          <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">Copyright © 2024 <a href="https://www.bootstrapdash.com/" class="text-muted" target="_blank">Bootstrapdash</a>. All rights reserved.</span>
+                          <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center text-muted">Hand-crafted & made with <i class="typcn typcn-heart-full-outline text-danger"></i></span>
+                      </div>
+                  </div>    
+              </div>        
+          </footer>
+          <!-- partial -->
       </div>
       <!-- main-panel ends -->
     </div>

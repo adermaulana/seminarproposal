@@ -13,38 +13,16 @@ if($_SESSION['status'] != 'login'){
 
 }
 
+if(isset($_GET['hal']) == "hapus"){
 
-if(isset($_GET['hal'])){
-    if($_GET['hal'] == "edit"){
-        $tampil = mysqli_query($koneksi, "SELECT * FROM prodi WHERE id = '$_GET[id]'");
-        $data = mysqli_fetch_array($tampil);
-        if($data){
-            $id = $data['id'];
-            $kode = $data['kode'];
-            $prodi = $data['prodi'];
-        }
-    }
-}
+  $hapus = mysqli_query($koneksi, "DELETE FROM dosen WHERE id = '$_GET[id]'");
 
-//Perintah Mengubah Data
-if (isset($_POST['simpan'])) {
-    // Update data pelanggan
-    $simpan = mysqli_query($koneksi, "UPDATE prodi SET
-                                        kode = '$_POST[kode]',
-                                        prodi = '$_POST[prodi]'
-                                      WHERE id = '$_GET[id]'");
-
-    if ($simpan) {
-        echo "<script>
-                alert('Edit data sukses!');
-                document.location='programstudi.php';
-              </script>";
-    } else {
-        echo "<script>
-                alert('Edit data Gagal!');
-                document.location='programstudi.php';
-              </script>";
-    }
+  if($hapus){
+      echo "<script>
+      alert('Hapus data sukses!');
+      document.location='dosen.php';
+      </script>";
+  }
 }
 
 ?>
@@ -55,7 +33,7 @@ if (isset($_POST['simpan'])) {
   <!-- Required meta tags -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>PolluxUI Admin</title>
+  <title>Admin</title>
   <!-- base:css -->
   <link rel="stylesheet" href="../assets/vendors/typicons/typicons.css">
   <link rel="stylesheet" href="../assets/vendors/css/vendor.bundle.base.css">
@@ -73,8 +51,6 @@ if (isset($_POST['simpan'])) {
     <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
       <div class="navbar-brand-wrapper d-flex justify-content-center">
         <div class="navbar-brand-inner-wrapper d-flex justify-content-between align-items-center w-100">
-          <a class="navbar-brand brand-logo" href="index.php"><img src="../assets/images/logo.svg" alt="logo"/></a>
-          <a class="navbar-brand brand-logo-mini" href="index.php"><img src="../assets/images/logo-mini.svg" alt="logo"/></a>
           <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
             <span class="typcn typcn-th-menu"></span>
           </button>
@@ -101,6 +77,7 @@ if (isset($_POST['simpan'])) {
       </div>
     </nav>
     <!-- partial -->
+
     <div class="container-fluid page-body-wrapper">      
       <!-- partial:partials/_sidebar.html -->
       <nav class="sidebar sidebar-offcanvas" id="sidebar">
@@ -112,21 +89,33 @@ if (isset($_POST['simpan'])) {
             </a>
           </li>                                    
           <li class="nav-item">
-            <a class="nav-link" href="#">
+            <a class="nav-link" href="mahasiswa.php">
               <i class="typcn typcn-device-desktop menu-icon"></i>
-              <span class="menu-title">Kelola Seminar</span>
+              <span class="menu-title">Mahasiswa</span>
             </a>
           </li>                                    
           <li class="nav-item">
-            <a class="nav-link" href="#">
+            <a class="nav-link" href="dosen.php">
+              <i class="typcn typcn-device-desktop menu-icon"></i>
+              <span class="menu-title">Dosen</span>
+            </a>
+          </li>                                    
+          <li class="nav-item">
+            <a class="nav-link" href="proposal.php">
+              <i class="typcn typcn-device-desktop menu-icon"></i>
+              <span class="menu-title">Proposal</span>
+            </a>
+          </li>                                    
+          <li class="nav-item">
+            <a class="nav-link" href="jadwal.php">
+              <i class="typcn typcn-device-desktop menu-icon"></i>
+              <span class="menu-title">Jadwal Seminar</span>
+            </a>
+          </li>                                                                     
+          <li class="nav-item">
+            <a class="nav-link" href="laporan.php">
               <i class="typcn typcn-device-desktop menu-icon"></i>
               <span class="menu-title">Laporan</span>
-            </a>
-          </li>                                    
-          <li class="nav-item">
-            <a class="nav-link" href="programstudi.php">
-              <i class="typcn typcn-device-desktop menu-icon"></i>
-              <span class="menu-title">Kelola Program Studi</span>
             </a>
           </li>                                    
           <li class="nav-item">
@@ -138,39 +127,69 @@ if (isset($_POST['simpan'])) {
         </ul>
       </nav>
       <!-- partial -->
-      <div class="main-panel">        
+      <div class="main-panel">
         <div class="content-wrapper">
-          <div class="row">
-            <div class="col-md-6 grid-margin stretch-card">
-              <div class="card">
+            <div class="row">
+            <div class="col-lg-12 grid-margin stretch-card">
+                <div class="card">
                 <div class="card-body">
-                  <h4 class="card-title">Tambah Prodi</h4>
-                  <form class="forms-sample" method="POST">
-                    <div class="form-group">
-                      <label for="kode">Kode</label>
-                      <input type="text" class="form-control" name="kode" id="kode" value="<?= $kode ?>" placeholder="Kode" required>
+                    <h4 class="card-title">Dosen</h4>
+                    <a class="btn btn-success mb-2" href="tambahdosen.php">Tambah Data</a>
+                    <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>NIP</th>
+                            <th>Nama</th>
+                            <th>Email</th>
+                            <th>Bidang Keahlian</th>
+                            <th>Aksi</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <?php
+                            $no = 1;
+                            $tampil = mysqli_query($koneksi, "SELECT * FROM dosen ORDER BY nip ASC");
+                            while($data = mysqli_fetch_array($tampil)):
+                        ?>
+                        <tr>
+                            <td><?= $no++ ?></td>
+                            <td><?= $data['nip'] ?></td>
+                            <td><?= $data['nama'] ?></td>
+                            <td><?= $data['email'] ?></td>
+                            <td><?= $data['bidang_keahlian'] ?></td>
+                            <td>
+                            <a class="btn btn-warning" href="editdosen.php?hal=edit&nip=<?= $data['nip'] ?>">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                            <a class="btn btn-danger" href="dosen.php?hal=hapus&nip=<?= $data['nip'] ?>" 
+                                onclick="return confirm('Apakah Anda yakin ingin menghapus data dosen ini?')">
+                                <i class="fas fa-trash"></i> Hapus
+                            </a>
+                            </td>
+                        </tr>
+                        <?php
+                            endwhile;
+                        ?>
+                        </tbody>
+                    </table>
                     </div>
-                    <div class="form-group">
-                      <label for="prodi">Program Studi</label>
-                      <input type="text" class="form-control" name="prodi" id="prodi" value="<?= $prodi ?>" placeholder="Program Studi" required>
-                    </div>
-                    <button type="submit" name="simpan" class="btn btn-primary me-2">Submit</button>
-                  </form>
                 </div>
-              </div>
+                </div>
             </div>
-          </div>
+            </div>
         </div>
         <!-- content-wrapper ends -->
         <!-- partial:../../partials/_footer.html -->
         <footer class="footer">
             <div class="card">
-                <div class="card-body">
-                    <div class="d-sm-flex justify-content-center justify-content-sm-between">
-                        <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">Copyright © 2024 <a href="https://www.bootstrapdash.com/" class="text-muted" target="_blank">Bootstrapdash</a>. All rights reserved.</span>
-                        <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center text-muted">Hand-crafted & made with <i class="typcn typcn-heart-full-outline text-danger"></i></span>
-                    </div>
-                </div>    
+            <div class="card-body">
+                <div class="d-sm-flex justify-content-center justify-content-sm-between">
+                <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">Copyright © 2024 <a href="https://www.bootstrapdash.com/" class="text-muted" target="_blank">Bootstrapdash</a>. All rights reserved.</span>
+                <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center text-muted">Hand-crafted & made with <i class="typcn typcn-heart-full-outline text-danger"></i></span>
+                </div>
+            </div>    
             </div>        
         </footer>
         <!-- partial -->
