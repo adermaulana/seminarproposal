@@ -20,7 +20,7 @@ if(isset($_POST['bsimpan'])) {
   $nama = mysqli_real_escape_string($koneksi, $_POST['nama']);
   $email = mysqli_real_escape_string($koneksi, $_POST['email']);
   $jurusan = mysqli_real_escape_string($koneksi, $_POST['jurusan']);
-  $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+  $password = md5($_POST['password']);
 
   // Cek apakah NIM sudah ada
   $cek = mysqli_query($koneksi, "SELECT nim FROM mahasiswa WHERE nim = '$nim'");

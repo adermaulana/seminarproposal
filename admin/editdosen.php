@@ -25,7 +25,7 @@ if(isset($_POST['bupdate'])) {
     // Buat query update sesuai dengan ada tidaknya perubahan password
     if(!empty($_POST['password'])) {
         // Jika password diisi, update dengan password baru
-        $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+        $password = md5($_POST['password']);
         $update = mysqli_query($koneksi, "UPDATE dosen SET 
                                          nama = '$nama',
                                          email = '$email',

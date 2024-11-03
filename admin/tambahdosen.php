@@ -20,7 +20,7 @@ if(isset($_POST['bsimpan'])) {
     $nama = mysqli_real_escape_string($koneksi, $_POST['nama']);
     $email = mysqli_real_escape_string($koneksi, $_POST['email']);
     $bidang_keahlian = mysqli_real_escape_string($koneksi, $_POST['bidang_keahlian']);
-    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+    $password = md5($_POST['password']);
 
     // Cek apakah NIP sudah ada
     $cek = mysqli_query($koneksi, "SELECT nip FROM dosen WHERE nip = '$nip'");
