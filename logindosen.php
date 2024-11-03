@@ -11,19 +11,19 @@
 
     if(isset($_POST['login'])){
 
-        $username = $_POST['username'];
+        $nip = $_POST['nip'];
         $password = md5($_POST['password']);
 
-        $login = mysqli_query($koneksi, "SELECT * FROM admin WHERE username='$username' and password='$password'");
+        $login = mysqli_query($koneksi, "SELECT * FROM dosen WHERE nip='$nip' and password='$password'");
         $cek = mysqli_num_rows($login);
 
         if($cek > 0) {
             $admin_data = mysqli_fetch_assoc($login);
-            $_SESSION['id_admin'] = $admin_data['id'];
-            $_SESSION['nama_admin'] = $admin_data['nama'];
-            $_SESSION['username_admin'] = $username;
+            $_SESSION['nip'] = $admin_data['nip'];
+            $_SESSION['nama_dosen'] = $admin_data['nama'];
+            $_SESSION['username_dosen'] = $username;
             $_SESSION['status'] = "login";
-            header('location:admin');
+            header('location:dosen');
 
         }  else {
             echo "<script>
@@ -62,13 +62,13 @@
         <div class="card shadow-2-strong" style="border-radius: 1rem;">
             <div class="card-body p-5 text-center">
                 <a class="btn btn-success btn-lg btn-block" href="loginmahasiswa.php">Mahasiswa</a>
-                <a class="btn btn-primary btn-lg btn-block" href="logindosen.php">Dosen</a>
+                <a class="btn btn-primary btn-lg btn-block" href="index.php">Admin</a>
 
                 <h3 class="mb-5 mt-3">Sign in</h3>
 
                 <div data-mdb-input-init class="form-outline mb-4">
-                    <label class="form-label" for="username">Username</label>
-                <input type="text" id="username" name="username" class="form-control form-control-lg" />
+                    <label class="form-label" for="nip">Nip</label>
+                <input type="text" id="nip" name="nip" class="form-control form-control-lg" />
                 </div>
 
                 <div data-mdb-input-init class="form-outline mb-4">

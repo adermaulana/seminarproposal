@@ -11,19 +11,19 @@
 
     if(isset($_POST['login'])){
 
-        $username = $_POST['username'];
+        $nim = $_POST['nim'];
         $password = md5($_POST['password']);
 
-        $login = mysqli_query($koneksi, "SELECT * FROM admin WHERE username='$username' and password='$password'");
+        $login = mysqli_query($koneksi, "SELECT * FROM mahasiswa WHERE nim='$nim' and password='$password'");
         $cek = mysqli_num_rows($login);
 
         if($cek > 0) {
             $admin_data = mysqli_fetch_assoc($login);
-            $_SESSION['id_admin'] = $admin_data['id'];
-            $_SESSION['nama_admin'] = $admin_data['nama'];
-            $_SESSION['username_admin'] = $username;
+            $_SESSION['nim'] = $admin_data['nim'];
+            $_SESSION['nama_mahasiswa'] = $admin_data['nama'];
+            $_SESSION['username_mahasiswa'] = $username;
             $_SESSION['status'] = "login";
-            header('location:admin');
+            header('location:mahasiswa');
 
         }  else {
             echo "<script>
@@ -61,14 +61,14 @@
         <form method="post">
         <div class="card shadow-2-strong" style="border-radius: 1rem;">
             <div class="card-body p-5 text-center">
-                <a class="btn btn-success btn-lg btn-block" href="loginmahasiswa.php">Mahasiswa</a>
+                <a class="btn btn-success btn-lg btn-block" href="index.php">Admin</a>
                 <a class="btn btn-primary btn-lg btn-block" href="logindosen.php">Dosen</a>
 
                 <h3 class="mb-5 mt-3">Sign in</h3>
 
                 <div data-mdb-input-init class="form-outline mb-4">
-                    <label class="form-label" for="username">Username</label>
-                <input type="text" id="username" name="username" class="form-control form-control-lg" />
+                    <label class="form-label" for="nim">Nim</label>
+                <input type="text" id="nim" name="nim" class="form-control form-control-lg" />
                 </div>
 
                 <div data-mdb-input-init class="form-outline mb-4">
