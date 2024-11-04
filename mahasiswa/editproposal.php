@@ -13,9 +13,8 @@ if($_SESSION['status'] != 'login'){
 
 }
 
-
 function upload_file($file) {
-    $target_dir = "uploads/proposal/";
+    $target_dir = "../admin/uploads/proposal/";
     $file_name = time() . '_' . basename($file["name"]);
     $target_file = $target_dir . $file_name;
     $file_type = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
@@ -42,49 +41,60 @@ function upload_file($file) {
     return false;
 }
 
-// Proses simpan data
-if(isset($_POST['bsimpan'])) {
+// Proses update data
+if(isset($_POST['bupdate'])) {
+    $id = $_POST['id'];
     $nim = $_POST['nim'];
     $judul = $_POST['judul'];
+    $old_file = $_POST['old_file'];
     $tanggal_pengajuan = date('Y-m-d H:i:s');
     $status = "Menunggu Persetujuan";
     
-    // Cek apakah NIM ada di tabel mahasiswa
-    $check_nim = mysqli_query($koneksi, "SELECT nim FROM mahasiswa WHERE nim = '$nim'");
-    if(mysqli_num_rows($check_nim) == 0) {
-        echo "<script>
-                alert('NIM tidak terdaftar dalam database!');
-                document.location='tambahproposal.php';
-             </script>";
-        exit;
-    }
-    
-    // Upload file
-    $file_name = upload_file($_FILES['file_proposal']);
-    
-    if($file_name) {
-        // Simpan ke database
-        $simpan = mysqli_query($koneksi, "INSERT INTO proposal (nim, judul, file_proposal, tanggal_pengajuan, status) 
-                                         VALUES ('$nim','$judul','$file_name','$tanggal_pengajuan','$status')");
+    // Cek apakah ada file baru yang diupload
+    if(!empty($_FILES['file_proposal']['name'])) {
+        // Upload file baru
+        $file_name = upload_file($_FILES['file_proposal']);
         
-        if($simpan) {
-            echo "<script>
-                    alert('Simpan data sukses!');
-                    document.location='proposal.php';
-                 </script>";
+        if($file_name) {
+            // Hapus file lama
+            $old_file_path = "../admin/uploads/proposal/" . $old_file;
+            if(file_exists($old_file_path)) {
+                unlink($old_file_path);
+            }
         } else {
             echo "<script>
-                    alert('Simpan data GAGAL!!');
-                    document.location='tambahproposal.php';
+                    alert('Upload file gagal! Pastikan ukuran file maksimal 5MB dan format sesuai ketentuan.');
+                    document.location='edit_proposal.php?id=$id';
                  </script>";
+            exit;
         }
     } else {
+        // Jika tidak ada file baru, gunakan file lama
+        $file_name = $old_file;
+    }
+    
+    // Update database
+    $update = mysqli_query($koneksi, "UPDATE proposal SET 
+                                     judul = '$judul',
+                                     file_proposal = '$file_name',
+                                     tanggal_pengajuan = '$tanggal_pengajuan',
+                                     status = '$status'
+                                     WHERE id = '$id'");
+    
+    if($update) {
         echo "<script>
-                alert('Upload file gagal! Pastikan ukuran file maksimal 5MB dan format sesuai ketentuan.');
-                document.location='tambahproposal.php';
+                alert('Update data sukses!');
+                document.location='proposal.php';
+             </script>";
+    } else {
+        echo "<script>
+                alert('Update data GAGAL!!');
+                document.location='edit_proposal.php?id=$id';
              </script>";
     }
 }
+
+$nim = $_SESSION['nim'];
 
 ?>
 <!DOCTYPE html>
@@ -122,7 +132,7 @@ if(isset($_POST['bsimpan'])) {
           <li class="nav-item nav-profile dropdown">
             <a class="nav-link" href="#" data-bs-toggle="dropdown" id="profileDropdown">
               <img src="../assets/images/faces/face5.jpg" alt="profile"/>
-              <span class="nav-profile-name"><?= $_SESSION['nama_admin'] ?></span>
+              <span class="nav-profile-name"><?= $_SESSION['nama_mahasiswa'] ?></span>
             </a>
             <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="profileDropdown">
               <a class="dropdown-item" href="logout.php">
@@ -147,31 +157,19 @@ if(isset($_POST['bsimpan'])) {
               <i class="typcn typcn-device-desktop menu-icon"></i>
               <span class="menu-title">Dashboard</span>
             </a>
-          </li>                                    
-          <li class="nav-item">
-            <a class="nav-link" href="mahasiswa.php">
-              <i class="typcn typcn-device-desktop menu-icon"></i>
-              <span class="menu-title">Mahasiswa</span>
-            </a>
-          </li>                                    
-          <li class="nav-item">
-            <a class="nav-link" href="dosen.php">
-              <i class="typcn typcn-device-desktop menu-icon"></i>
-              <span class="menu-title">Dosen</span>
-            </a>
-          </li>                                    
+          </li>
           <li class="nav-item">
             <a class="nav-link" href="proposal.php">
               <i class="typcn typcn-device-desktop menu-icon"></i>
               <span class="menu-title">Proposal</span>
             </a>
-          </li>                                    
+          </li>                                     
           <li class="nav-item">
             <a class="nav-link" href="jadwal.php">
               <i class="typcn typcn-device-desktop menu-icon"></i>
               <span class="menu-title">Jadwal Seminar</span>
             </a>
-          </li>                                                                       
+          </li>                                                                      
           <li class="nav-item">
             <a class="nav-link" href="laporan.php">
               <i class="typcn typcn-device-desktop menu-icon"></i>
@@ -187,52 +185,64 @@ if(isset($_POST['bsimpan'])) {
         </ul>
       </nav>
       <!-- partial -->
-         <div class="main-panel">        
+        <div class="main-panel">        
             <div class="content-wrapper">
                 <div class="row">
                     <div class="col-md-6 grid-margin stretch-card">
                         <div class="card">
                             <div class="card-body">
-                                <h4 class="card-title">Ajukan Proposal</h4>
+                                <h4 class="card-title">Edit Proposal</h4>
+                                <?php
+                                // Ambil data proposal yang akan diedit
+                                $id = $_GET['id'];
+                                $query = mysqli_query($koneksi, "SELECT * FROM proposal WHERE id='$id'");
+                                $data = mysqli_fetch_array($query);
+                                
+                                // Pastikan proposal ditemukan dan statusnya 'Revisi'
+                                if(!$data || $data['status'] != 'Revisi') {
+                                    echo "<script>
+                                            alert('Data proposal tidak ditemukan atau tidak dapat diedit!');
+                                            document.location='proposal.php';
+                                        </script>";
+                                    exit;
+                                }
+                                ?>
                                 <form class="forms-sample" method="POST" enctype="multipart/form-data">
+                                    <input type="hidden" name="id" value="<?= $data['id'] ?>">
+                                    <input type="hidden" name="old_file" value="<?= $data['file_proposal'] ?>">
+                                    
                                     <div class="form-group">
                                         <label for="nim">NIM</label>
-                                        <?php if(isset($_SESSION['nim'])): ?>
-                                            <input type="text" class="form-control" name="nim" id="nim" value="<?= $_SESSION['nim'] ?>" readonly>
-                                        <?php else: ?>
-                                            <select class="form-control" name="nim" id="nim" required>
-                                                <option value="">Pilih NIM</option>
-                                                <?php
-                                                $query_mhs = mysqli_query($koneksi, "SELECT nim, nama FROM mahasiswa ORDER BY nim");
-                                                while($mhs = mysqli_fetch_array($query_mhs)):
-                                                ?>
-                                                <option value="<?= $mhs['nim'] ?>"><?= $mhs['nim'] ?> - <?= $mhs['nama'] ?></option>
-                                                <?php endwhile; ?>
-                                            </select>
-                                        <?php endif; ?>
+                                        <input type="text" class="form-control" name="nim" id="nim" 
+                                            value="<?= $data['nim'] ?>" readonly>
                                     </div>
                                     <div class="form-group">
                                         <label for="judul">Judul Proposal</label>
-                                        <textarea class="form-control" name="judul" id="judul" rows="3" placeholder="Masukkan Judul Proposal" required></textarea>
+                                        <textarea class="form-control" name="judul" id="judul" rows="3" 
+                                                placeholder="Masukkan Judul Proposal" required><?= $data['judul'] ?></textarea>
                                     </div>
                                     <div class="form-group">
                                         <label for="file_proposal">File Proposal</label>
-                                        <input type="file" class="form-control" name="file_proposal" id="file_proposal" accept=".pdf,.doc,.docx" required>
+                                        <input type="file" class="form-control" name="file_proposal" id="file_proposal" 
+                                            accept=".pdf,.doc,.docx">
                                         <small class="form-text text-muted">
                                             File yang diizinkan: PDF, DOC, DOCX. Maksimal 5MB
+                                        </small>
+                                        <small class="form-text text-muted">
+                                            File saat ini: <?= $data['file_proposal'] ?>
                                         </small>
                                     </div>
                                     <div class="form-group">
                                         <label for="tanggal_pengajuan">Tanggal Pengajuan</label>
-                                        <input type="text" class="form-control" name="tanggal_pengajuan" id="tanggal_pengajuan" 
+                                        <input type="text" class="form-control" name="tanggal_pengajuan" 
                                             value="<?= date('Y-m-d H:i:s') ?>" readonly>
                                     </div>
                                     <div class="form-group">
                                         <label for="status">Status</label>
-                                        <input type="text" class="form-control" name="status" id="status" 
+                                        <input type="text" class="form-control" name="status" 
                                             value="Menunggu Persetujuan" readonly>
                                     </div>
-                                    <button type="submit" name="bsimpan" class="btn btn-primary me-2">Submit</button>
+                                    <button type="submit" name="bupdate" class="btn btn-primary me-2">Update</button>
                                     <a href="proposal.php" class="btn btn-light">Cancel</a>
                                 </form>
                             </div>
@@ -240,17 +250,6 @@ if(isset($_POST['bsimpan'])) {
                     </div>
                 </div>
             </div>
-            <!-- Footer -->
-            <footer class="footer">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="d-sm-flex justify-content-center justify-content-sm-between">
-                            <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">Copyright © 2024 <a href="https://www.bootstrapdash.com/" class="text-muted" target="_blank">Bootstrapdash</a>. All rights reserved.</span>
-                            <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center text-muted">Hand-crafted & made with <i class="typcn typcn-heart-full-outline text-danger"></i></span>
-                        </div>
-                    </div>    
-                </div>        
-            </footer>
         </div>
       <!-- main-panel ends -->
     </div>

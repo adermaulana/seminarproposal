@@ -13,9 +13,8 @@ if($_SESSION['status'] != 'login'){
 
 }
 
-
 function upload_file($file) {
-    $target_dir = "uploads/proposal/";
+    $target_dir = "../admin/uploads/proposal/";
     $file_name = time() . '_' . basename($file["name"]);
     $target_file = $target_dir . $file_name;
     $file_type = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
@@ -86,6 +85,8 @@ if(isset($_POST['bsimpan'])) {
     }
 }
 
+$nim = $_SESSION['nim'];
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -122,7 +123,7 @@ if(isset($_POST['bsimpan'])) {
           <li class="nav-item nav-profile dropdown">
             <a class="nav-link" href="#" data-bs-toggle="dropdown" id="profileDropdown">
               <img src="../assets/images/faces/face5.jpg" alt="profile"/>
-              <span class="nav-profile-name"><?= $_SESSION['nama_admin'] ?></span>
+              <span class="nav-profile-name"><?= $_SESSION['nama_mahasiswa'] ?></span>
             </a>
             <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="profileDropdown">
               <a class="dropdown-item" href="logout.php">
@@ -147,31 +148,19 @@ if(isset($_POST['bsimpan'])) {
               <i class="typcn typcn-device-desktop menu-icon"></i>
               <span class="menu-title">Dashboard</span>
             </a>
-          </li>                                    
-          <li class="nav-item">
-            <a class="nav-link" href="mahasiswa.php">
-              <i class="typcn typcn-device-desktop menu-icon"></i>
-              <span class="menu-title">Mahasiswa</span>
-            </a>
-          </li>                                    
-          <li class="nav-item">
-            <a class="nav-link" href="dosen.php">
-              <i class="typcn typcn-device-desktop menu-icon"></i>
-              <span class="menu-title">Dosen</span>
-            </a>
-          </li>                                    
+          </li>
           <li class="nav-item">
             <a class="nav-link" href="proposal.php">
               <i class="typcn typcn-device-desktop menu-icon"></i>
               <span class="menu-title">Proposal</span>
             </a>
-          </li>                                    
+          </li>                                     
           <li class="nav-item">
             <a class="nav-link" href="jadwal.php">
               <i class="typcn typcn-device-desktop menu-icon"></i>
               <span class="menu-title">Jadwal Seminar</span>
             </a>
-          </li>                                                                       
+          </li>                                                                      
           <li class="nav-item">
             <a class="nav-link" href="laporan.php">
               <i class="typcn typcn-device-desktop menu-icon"></i>
@@ -187,7 +176,7 @@ if(isset($_POST['bsimpan'])) {
         </ul>
       </nav>
       <!-- partial -->
-         <div class="main-panel">        
+      <div class="main-panel">        
             <div class="content-wrapper">
                 <div class="row">
                     <div class="col-md-6 grid-margin stretch-card">

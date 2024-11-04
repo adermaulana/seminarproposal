@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 03, 2024 at 11:27 PM
+-- Generation Time: Nov 04, 2024 at 10:07 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -82,7 +82,8 @@ CREATE TABLE `mahasiswa` (
 --
 
 INSERT INTO `mahasiswa` (`nim`, `nama`, `email`, `jurusan`, `password`, `created_at`) VALUES
-('202061', 'Ade Rahmat Maulana', 'adermaulana15@gmail.com', 'Teknik Komputer', '827ccb0eea8a706c4c34a16891f84e7b', '2024-11-03 20:12:03');
+('202061', 'Ade Rahmat Maulana', 'adermaulana15@gmail.com', 'Teknik Komputer', '827ccb0eea8a706c4c34a16891f84e7b', '2024-11-03 20:12:03'),
+('202333', 'Sufandi Aliansyah', 'wandi@gmail.com', 'Teknik Informatika', '827ccb0eea8a706c4c34a16891f84e7b', '2024-11-04 08:46:03');
 
 -- --------------------------------------------------------
 
@@ -147,7 +148,8 @@ CREATE TABLE `proposal` (
 --
 
 INSERT INTO `proposal` (`id`, `nim`, `judul`, `file_proposal`, `tanggal_pengajuan`, `status`) VALUES
-(1, '202061', 'Pengembangan Aplikasi Mobile untuk Manajemen Inventaris menggunakan Teknologi Barcode', '1730667005_9_LARAVEL_CRUD.pdf', '2024-11-03 13:50:05', 'Disetujui');
+(1, '202061', 'Pengembangan Aplikasi Mobile untuk Manajemen Inventaris menggunakan Teknologi Barcode', '1730667005_9_LARAVEL_CRUD.pdf', '2024-11-03 13:50:05', 'Disetujui'),
+(2, '202333', 'Analisis dan Perancangan Sistem Informasi Manajemen Kepegawaian menggunakan Cloud Computing', '1730711229_3.-Modul-3-Model-Data-Relasional.pdf', '2024-11-04 02:07:09', 'Menunggu Persetujuan');
 
 -- --------------------------------------------------------
 
@@ -251,7 +253,7 @@ ALTER TABLE `penguji`
 -- AUTO_INCREMENT for table `proposal`
 --
 ALTER TABLE `proposal`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `seminar`

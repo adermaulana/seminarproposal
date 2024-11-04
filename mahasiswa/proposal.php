@@ -13,17 +13,7 @@ if($_SESSION['status'] != 'login'){
 
 }
 
-if(isset($_GET['hal']) == "hapus"){
-
-  $hapus = mysqli_query($koneksi, "DELETE FROM proposal WHERE id = '$_GET[id]'");
-
-  if($hapus){
-      echo "<script>
-      alert('Hapus data sukses!');
-      document.location='mahasiswa.php';
-      </script>";
-  }
-}
+$nim = $_SESSION['nim'];
 
 ?>
 <!DOCTYPE html>
@@ -61,7 +51,7 @@ if(isset($_GET['hal']) == "hapus"){
           <li class="nav-item nav-profile dropdown">
             <a class="nav-link" href="#" data-bs-toggle="dropdown" id="profileDropdown">
               <img src="../assets/images/faces/face5.jpg" alt="profile"/>
-              <span class="nav-profile-name"><?= $_SESSION['nama_admin'] ?></span>
+              <span class="nav-profile-name"><?= $_SESSION['nama_mahasiswa'] ?></span>
             </a>
             <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="profileDropdown">
               <a class="dropdown-item" href="logout.php">
@@ -77,7 +67,6 @@ if(isset($_GET['hal']) == "hapus"){
       </div>
     </nav>
     <!-- partial -->
-
     <div class="container-fluid page-body-wrapper">      
       <!-- partial:partials/_sidebar.html -->
       <nav class="sidebar sidebar-offcanvas" id="sidebar">
@@ -87,31 +76,19 @@ if(isset($_GET['hal']) == "hapus"){
               <i class="typcn typcn-device-desktop menu-icon"></i>
               <span class="menu-title">Dashboard</span>
             </a>
-          </li>                                    
-          <li class="nav-item">
-            <a class="nav-link" href="mahasiswa.php">
-              <i class="typcn typcn-device-desktop menu-icon"></i>
-              <span class="menu-title">Mahasiswa</span>
-            </a>
-          </li>                                    
-          <li class="nav-item">
-            <a class="nav-link" href="dosen.php">
-              <i class="typcn typcn-device-desktop menu-icon"></i>
-              <span class="menu-title">Dosen</span>
-            </a>
-          </li>                                    
+          </li>
           <li class="nav-item">
             <a class="nav-link" href="proposal.php">
               <i class="typcn typcn-device-desktop menu-icon"></i>
               <span class="menu-title">Proposal</span>
             </a>
-          </li>                                    
+          </li>                                     
           <li class="nav-item">
             <a class="nav-link" href="jadwal.php">
               <i class="typcn typcn-device-desktop menu-icon"></i>
               <span class="menu-title">Jadwal Seminar</span>
             </a>
-          </li>                                                                     
+          </li>                                                                      
           <li class="nav-item">
             <a class="nav-link" href="laporan.php">
               <i class="typcn typcn-device-desktop menu-icon"></i>
@@ -134,6 +111,7 @@ if(isset($_GET['hal']) == "hapus"){
                     <div class="card">
                         <div class="card-body">
                             <h4 class="card-title">Data Proposal</h4>
+                            <a class="btn btn-success mb-2" href="tambahproposal.php">Ajukan Proposal</a>
                             <div class="table-responsive">
                             <table class="table table-hover">
                                 <thead>
@@ -146,7 +124,6 @@ if(isset($_GET['hal']) == "hapus"){
                                         <th>File</th>
                                         <th>Tanggal Pengajuan</th>
                                         <th>Status</th>
-                                        <th>Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -154,7 +131,8 @@ if(isset($_GET['hal']) == "hapus"){
                                     $no = 1;
                                     $tampil = mysqli_query($koneksi, "SELECT p.*, m.nama AS nama_mahasiswa, m.jurusan 
                                                                     FROM proposal p 
-                                                                    JOIN mahasiswa m ON p.nim = m.nim 
+                                                                    JOIN mahasiswa m ON p.nim = m.nim
+                                                                    WHERE p.nim = '$nim' 
                                                                     ORDER BY p.tanggal_pengajuan DESC");
                                     while($data = mysqli_fetch_array($tampil)):
                                     ?>
@@ -165,7 +143,7 @@ if(isset($_GET['hal']) == "hapus"){
                                         <td><?= $data['jurusan'] ?></td>
                                         <td><?= $data['judul'] ?></td>
                                         <td>
-                                            <a href="uploads/proposal/<?= $data['file_proposal'] ?>" 
+                                            <a href="../admin/uploads/proposal/<?= $data['file_proposal'] ?>" 
                                             class="btn btn-info btn-sm" target="_blank">
                                                 <i class="fas fa-download"></i> Download
                                             </a>
@@ -190,37 +168,13 @@ if(isset($_GET['hal']) == "hapus"){
                                                     break;
                                             }
                                             ?>
+                                            <?php if($status == 'Revisi'): ?>
+                                                <a href="editproposal.php?id=<?= $data['id'] ?>" class="btn btn-warning btn-sm mt-1">
+                                                    <i class="fas fa-edit"></i> Revisi
+                                                </a>
+                                            <?php else : ?>
                                             <span class="badge badge-<?= $badge_color ?>"><?= $status ?></span>
-                                        </td>
-                                        <td>
-                                            <?php if($data['status'] == 'Menunggu Persetujuan'): ?>
-                                            <a class="btn btn-success btn-sm" 
-                                            href="proses_setuju.php?id=<?= $data['id'] ?>" 
-                                            onclick="return confirm('Apakah Anda yakin ingin menyetujui proposal ini?')">
-                                                <i class="fas fa-check"></i> Setujui
-                                            </a>
-                                            <a class="btn btn-secondary btn-sm" 
-                                            href="proses_tolak.php?id=<?= $data['id'] ?>" 
-                                            onclick="return confirm('Apakah Anda yakin ingin menolak proposal ini?')">
-                                                <i class="fas fa-times"></i> Tolak
-                                            </a>
-                                            <a class="btn btn-info btn-sm" 
-                                            href="proses_revisi.php?id=<?= $data['id'] ?>" 
-                                            onclick="return confirm('Apakah Anda yakin ingin meminta revisi proposal ini?')">
-                                                <i class="fas fa-redo"></i> Revisi
-                                            </a>
-                                            <?php elseif($data['status'] == 'Revisi'): ?>
-                                            <a class="btn btn-warning btn-sm" 
-                                            href="proses_menunggu.php?id=<?= $data['id'] ?>" 
-                                            onclick="return confirm('Apakah Anda yakin ingin meminta menunggu persetujuan untuk proposal ini?')">
-                                                <i class="fas fa-redo"></i> Menunggu Persetujuan
-                                            </a>
                                             <?php endif; ?>
-                                            <a class="btn btn-danger btn-sm" 
-                                            href="hapusproposal.php?id=<?= $data['id'] ?>" 
-                                            onclick="return confirm('Apakah Anda yakin ingin menghapus proposal ini?')">
-                                                <i class="fas fa-trash"></i> Hapus
-                                            </a>
                                         </td>
                                     </tr>
                                     <?php endwhile; ?>
