@@ -217,7 +217,7 @@ if(isset($_GET['hal']) == "hapus"){
                                             </a>
                                             <?php endif; ?>
                                             <a class="btn btn-danger btn-sm" 
-                                            href="hapusproposal.php?id=<?= $data['id'] ?>" 
+                                            href="proposal.php?hal=hapus&id=<?= $data['id'] ?>" 
                                             onclick="return confirm('Apakah Anda yakin ingin menghapus proposal ini?')">
                                                 <i class="fas fa-trash"></i> Hapus
                                             </a>
