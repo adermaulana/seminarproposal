@@ -15,7 +15,7 @@ if($_SESSION['status'] != 'login'){
 
 if(isset($_GET['hal']) == "hapus"){
 
-  $hapus = mysqli_query($koneksi, "DELETE FROM mahasiswa WHERE id = '$_GET[id]'");
+  $hapus = mysqli_query($koneksi, "DELETE FROM mahasiswa WHERE nim = '$_GET[nim]'");
 
   if($hapus){
       echo "<script>
