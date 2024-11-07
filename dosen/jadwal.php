@@ -4,6 +4,8 @@ include '../koneksi.php';
 
 session_start();
 
+$nip_dosen = $_SESSION['nip'];
+
 if($_SESSION['status'] != 'login'){
 
     session_unset();
@@ -11,18 +13,6 @@ if($_SESSION['status'] != 'login'){
 
     header("location:../");
 
-}
-
-if(isset($_GET['hal']) == "hapus"){
-
-  $hapus = mysqli_query($koneksi, "DELETE FROM proposal WHERE id = '$_GET[id]'");
-
-  if($hapus){
-      echo "<script>
-      alert('Hapus data sukses!');
-      document.location='proposal.php';
-      </script>";
-  }
 }
 
 ?>
@@ -61,7 +51,7 @@ if(isset($_GET['hal']) == "hapus"){
           <li class="nav-item nav-profile dropdown">
             <a class="nav-link" href="#" data-bs-toggle="dropdown" id="profileDropdown">
               <img src="../assets/images/faces/face5.jpg" alt="profile"/>
-              <span class="nav-profile-name"><?= $_SESSION['nama_admin'] ?></span>
+              <span class="nav-profile-name"><?= $_SESSION['nama_dosen'] ?></span>
             </a>
             <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="profileDropdown">
               <a class="dropdown-item" href="logout.php">
@@ -77,7 +67,6 @@ if(isset($_GET['hal']) == "hapus"){
       </div>
     </nav>
     <!-- partial -->
-
     <div class="container-fluid page-body-wrapper">      
       <!-- partial:partials/_sidebar.html -->
       <nav class="sidebar sidebar-offcanvas" id="sidebar">
@@ -89,29 +78,11 @@ if(isset($_GET['hal']) == "hapus"){
             </a>
           </li>                                    
           <li class="nav-item">
-            <a class="nav-link" href="mahasiswa.php">
-              <i class="typcn typcn-device-desktop menu-icon"></i>
-              <span class="menu-title">Mahasiswa</span>
-            </a>
-          </li>                                    
-          <li class="nav-item">
-            <a class="nav-link" href="dosen.php">
-              <i class="typcn typcn-device-desktop menu-icon"></i>
-              <span class="menu-title">Dosen</span>
-            </a>
-          </li>                                    
-          <li class="nav-item">
-            <a class="nav-link" href="proposal.php">
-              <i class="typcn typcn-device-desktop menu-icon"></i>
-              <span class="menu-title">Proposal</span>
-            </a>
-          </li>                                    
-          <li class="nav-item">
             <a class="nav-link" href="jadwal.php">
               <i class="typcn typcn-device-desktop menu-icon"></i>
               <span class="menu-title">Jadwal Seminar</span>
             </a>
-          </li>                                                                     
+          </li>                                                                      
           <li class="nav-item">
             <a class="nav-link" href="laporan.php">
               <i class="typcn typcn-device-desktop menu-icon"></i>
@@ -133,7 +104,7 @@ if(isset($_GET['hal']) == "hapus"){
                 <div class="col-lg-12 grid-margin stretch-card">
                     <div class="card">
                         <div class="card-body">
-                            <h4 class="card-title">Data Proposal</h4>
+                            <h4 class="card-title">Data Seminar</h4>
                             <div class="table-responsive">
                             <table class="table table-hover">
                                 <thead>
@@ -143,84 +114,98 @@ if(isset($_GET['hal']) == "hapus"){
                                         <th>Nama Mahasiswa</th>
                                         <th>Program Studi</th>
                                         <th>Judul</th>
-                                        <th>File</th>
-                                        <th>Tanggal Pengajuan</th>
+                                        <th>Tanggal</th>
+                                        <th>Waktu</th>
+                                        <th>Ruangan</th>
+                                        <th>Pembimbing</th>
+                                        <th>Penguji</th>
                                         <th>Status</th>
-                                        <th>Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php
-                                    $no = 1;
-                                    $tampil = mysqli_query($koneksi, "SELECT p.*, m.nama AS nama_mahasiswa, m.jurusan 
-                                                                    FROM proposal p 
-                                                                    JOIN mahasiswa m ON p.nim = m.nim 
-                                                                    ORDER BY p.tanggal_pengajuan DESC");
-                                    while($data = mysqli_fetch_array($tampil)):
-                                    ?>
+                                <?php
+                                $no = 1;
+                                $tampil = mysqli_query($koneksi, "
+                                    SELECT s.*, p.judul, p.nim, m.nama AS nama_mahasiswa, m.jurusan 
+                                    FROM seminar s
+                                    JOIN proposal p ON s.proposal_id = p.id
+                                    JOIN mahasiswa m ON p.nim = m.nim
+                                    WHERE p.id IN (
+                                        SELECT proposal_id 
+                                        FROM pembimbing 
+                                        WHERE nip = '$nip_dosen'
+                                    )
+                                    OR s.id IN (
+                                        SELECT seminar_id
+                                        FROM penguji
+                                        WHERE nip = '$nip_dosen'
+                                    )
+                                    ORDER BY s.tanggal DESC, s.waktu DESC
+                                ");
+
+                                while($data = mysqli_fetch_array($tampil)):
+                                    // Query untuk mendapatkan pembimbing
+                                    $pembimbing_query = mysqli_query($koneksi, "
+                                        SELECT d.nama, pb.status
+                                        FROM pembimbing pb
+                                        JOIN dosen d ON pb.nip = d.nip
+                                        WHERE pb.proposal_id = '$data[proposal_id]'
+                                        ORDER BY pb.status
+                                    ");
+
+                                    // Query untuk mendapatkan penguji
+                                    $penguji_query = mysqli_query($koneksi, "
+                                        SELECT d.nama 
+                                        FROM penguji p
+                                        JOIN dosen d ON p.nip = d.nip
+                                        WHERE p.seminar_id = '$data[id]'
+                                    ");
+                                ?>
                                     <tr>
                                         <td><?= $no++ ?></td>
                                         <td><?= $data['nim'] ?></td>
                                         <td><?= $data['nama_mahasiswa'] ?></td>
                                         <td><?= $data['jurusan'] ?></td>
                                         <td><?= $data['judul'] ?></td>
+                                        <td><?= date('d-m-Y', strtotime($data['tanggal'])) ?></td>
+                                        <td><?= date('H:i', strtotime($data['waktu'])) ?></td>
+                                        <td><?= $data['ruangan'] ?></td>
                                         <td>
-                                            <a href="uploads/proposal/<?= $data['file_proposal'] ?>" 
-                                            class="btn btn-info btn-sm" target="_blank">
-                                                <i class="fas fa-download"></i> Download
-                                            </a>
+                                            <?php 
+                                            while($pembimbing = mysqli_fetch_array($pembimbing_query)) {
+                                                echo $pembimbing['nama'] . ' (' . $pembimbing['status'] . ')<br>';
+                                            }
+                                            ?>
                                         </td>
-                                        <td><?= date('d-m-Y H:i', strtotime($data['tanggal_pengajuan'])) ?></td>
+                                        <td>
+                                            <?php 
+                                            $i = 1;
+                                            while($penguji = mysqli_fetch_array($penguji_query)) {
+                                                echo 'Penguji ' . $i . ': ' . $penguji['nama'] . '<br>';
+                                                $i++;
+                                            }
+                                            ?>
+                                        </td>
                                         <td>
                                             <?php
                                             $status = $data['status'];
                                             $badge_color = '';
                                             switch($status) {
-                                                case 'Menunggu Persetujuan':
-                                                    $badge_color = 'warning';
+                                                case 'Dijadwalkan':
+                                                    $badge_color = 'primary';
                                                     break;
-                                                case 'Disetujui':
+                                                case 'Selesai':
                                                     $badge_color = 'success';
                                                     break;
-                                                case 'Ditolak':
+                                                case 'Dibatalkan':
                                                     $badge_color = 'danger';
                                                     break;
-                                                case 'Revisi':
-                                                    $badge_color = 'info';
+                                                case 'Ditunda':
+                                                    $badge_color = 'warning';
                                                     break;
                                             }
                                             ?>
                                             <span class="badge badge-<?= $badge_color ?>"><?= $status ?></span>
-                                        </td>
-                                        <td>
-                                            <?php if($data['status'] == 'Menunggu Persetujuan'): ?>
-                                            <a class="btn btn-success btn-sm" 
-                                            href="proses_setuju.php?id=<?= $data['id'] ?>" 
-                                            onclick="return confirm('Apakah Anda yakin ingin menyetujui proposal ini?')">
-                                                <i class="fas fa-check"></i> Setujui
-                                            </a>
-                                            <a class="btn btn-secondary btn-sm" 
-                                            href="proses_tolak.php?id=<?= $data['id'] ?>" 
-                                            onclick="return confirm('Apakah Anda yakin ingin menolak proposal ini?')">
-                                                <i class="fas fa-times"></i> Tolak
-                                            </a>
-                                            <a class="btn btn-info btn-sm" 
-                                            href="proses_revisi.php?id=<?= $data['id'] ?>" 
-                                            onclick="return confirm('Apakah Anda yakin ingin meminta revisi proposal ini?')">
-                                                <i class="fas fa-redo"></i> Revisi
-                                            </a>
-                                            <?php elseif($data['status'] == 'Revisi'): ?>
-                                            <a class="btn btn-warning btn-sm" 
-                                            href="proses_menunggu.php?id=<?= $data['id'] ?>" 
-                                            onclick="return confirm('Apakah Anda yakin ingin meminta menunggu persetujuan untuk proposal ini?')">
-                                                <i class="fas fa-redo"></i> Menunggu Persetujuan
-                                            </a>
-                                            <?php endif; ?>
-                                            <a class="btn btn-danger btn-sm" 
-                                            href="hapusproposal.php?id=<?= $data['id'] ?>" 
-                                            onclick="return confirm('Apakah Anda yakin ingin menghapus proposal ini?')">
-                                                <i class="fas fa-trash"></i> Hapus
-                                            </a>
                                         </td>
                                     </tr>
                                     <?php endwhile; ?>

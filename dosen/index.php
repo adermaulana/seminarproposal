@@ -98,7 +98,8 @@ if($_SESSION['status'] != 'login'){
       <!-- partial -->
       <div class="main-panel">
         <div class="content-wrapper">
-          <div class="row">
+          <h3>Welcome, <?= $_SESSION['nama_dosen'] ?></h3>
+          <!-- <div class="row">
             <div class="col-md-12">
               <div class="card">
                 <h3 class="mt-3 ms-3">Jadwal Seminar Terdekat</h3>
@@ -128,7 +129,7 @@ if($_SESSION['status'] != 'login'){
                 </div>
               </div>
             </div>
-          </div>
+          </div> -->
 
         </div>
         <!-- content-wrapper ends -->

@@ -15,12 +15,12 @@ if($_SESSION['status'] != 'login'){
 
 if(isset($_GET['hal']) == "hapus"){
 
-  $hapus = mysqli_query($koneksi, "DELETE FROM proposal WHERE id = '$_GET[id]'");
+  $hapus = mysqli_query($koneksi, "DELETE FROM seminar WHERE id = '$_GET[id]'");
 
   if($hapus){
       echo "<script>
       alert('Hapus data sukses!');
-      document.location='mahasiswa.php';
+      document.location='jadwal.php';
       </script>";
   }
 }
@@ -255,7 +255,7 @@ if(isset($_GET['hal']) == "hapus"){
                                             <?php endif; ?>
 
                                             <a class="btn btn-danger btn-sm" 
-                                            href="hapus_seminar.php?id=<?= $data['id'] ?>" 
+                                            href="jadwal.php?hal=hapus&id=<?= $data['id'] ?>" 
                                             onclick="return confirm('Apakah Anda yakin ingin menghapus jadwal seminar ini?')">
                                                 <i class="fas fa-trash"></i> Hapus
                                             </a>
