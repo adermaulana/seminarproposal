@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 04, 2024 at 10:07 AM
+-- Generation Time: Nov 07, 2024 at 05:08 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -60,7 +60,11 @@ CREATE TABLE `dosen` (
 --
 
 INSERT INTO `dosen` (`nip`, `nama`, `email`, `bidang_keahlian`, `password`) VALUES
-('1060', 'Dosen', 'dosen@gmail.com', 'Artificial Intelligence', '827ccb0eea8a706c4c34a16891f84e7b');
+('2020', 'Pak Sunardi', 'sunardi@gmail.com', 'Mobile Computing', '827ccb0eea8a706c4c34a16891f84e7b'),
+('2021', 'Pak Michael', 'michael@gmail.com', 'Database Systems', '827ccb0eea8a706c4c34a16891f84e7b'),
+('2023', 'Pak Komang', 'komang@gmail.com', 'Network Security', '827ccb0eea8a706c4c34a16891f84e7b'),
+('2025', 'Pak Erfan', 'erfan@gmail.com', 'Web Development', '827ccb0eea8a706c4c34a16891f84e7b'),
+('2922', 'Pak Suarga', 'suarga@gmail.com', 'Artificial Intelligence', '827ccb0eea8a706c4c34a16891f84e7b');
 
 -- --------------------------------------------------------
 
@@ -103,8 +107,8 @@ CREATE TABLE `pembimbing` (
 --
 
 INSERT INTO `pembimbing` (`id`, `proposal_id`, `nip`, `status`) VALUES
-(1, 1, '1060', 'Pembimbing 1'),
-(2, 1, '1060', 'Pembimbing 2');
+(3, 1, '2023', 'Pembimbing 1'),
+(4, 1, '2021', 'Pembimbing 2');
 
 -- --------------------------------------------------------
 
@@ -125,8 +129,8 @@ CREATE TABLE `penguji` (
 --
 
 INSERT INTO `penguji` (`id`, `seminar_id`, `nip`, `nilai`, `catatan`) VALUES
-(1, 1, '1060', NULL, NULL),
-(2, 1, '1060', NULL, NULL);
+(3, 2, '2922', NULL, NULL),
+(4, 2, '2020', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -149,7 +153,7 @@ CREATE TABLE `proposal` (
 
 INSERT INTO `proposal` (`id`, `nim`, `judul`, `file_proposal`, `tanggal_pengajuan`, `status`) VALUES
 (1, '202061', 'Pengembangan Aplikasi Mobile untuk Manajemen Inventaris menggunakan Teknologi Barcode', '1730667005_9_LARAVEL_CRUD.pdf', '2024-11-03 13:50:05', 'Disetujui'),
-(2, '202333', 'Analisis dan Perancangan Sistem Informasi Manajemen Kepegawaian menggunakan Cloud Computing', '1730711229_3.-Modul-3-Model-Data-Relasional.pdf', '2024-11-04 02:07:09', 'Menunggu Persetujuan');
+(2, '202333', 'Analisis dan Perancangan Sistem Informasi Manajemen Kepegawaian menggunakan Cloud Computing', '1730711229_3.-Modul-3-Model-Data-Relasional.pdf', '2024-11-04 02:07:09', 'Disetujui');
 
 -- --------------------------------------------------------
 
@@ -173,7 +177,7 @@ CREATE TABLE `seminar` (
 --
 
 INSERT INTO `seminar` (`id`, `proposal_id`, `tanggal`, `waktu`, `ruangan`, `status`, `nilai`, `catatan`) VALUES
-(1, 1, '2024-11-30', '09:24:00', 'B116', 'Selesai', NULL, NULL);
+(2, 1, '2024-11-30', '14:00:00', 'B116', 'Dijadwalkan', NULL, NULL);
 
 --
 -- Indexes for dumped tables
@@ -202,30 +206,30 @@ ALTER TABLE `mahasiswa`
 --
 ALTER TABLE `pembimbing`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `proposal_id` (`proposal_id`),
-  ADD KEY `nip` (`nip`);
+  ADD KEY `pembimbing_ibfk_1` (`proposal_id`),
+  ADD KEY `pembimbing_ibfk_2` (`nip`);
 
 --
 -- Indexes for table `penguji`
 --
 ALTER TABLE `penguji`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `seminar_id` (`seminar_id`),
-  ADD KEY `nip` (`nip`);
+  ADD KEY `penguji_ibfk_1` (`seminar_id`),
+  ADD KEY `penguji_ibfk_2` (`nip`);
 
 --
 -- Indexes for table `proposal`
 --
 ALTER TABLE `proposal`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `nim` (`nim`);
+  ADD KEY `proposal_ibfk_1` (`nim`);
 
 --
 -- Indexes for table `seminar`
 --
 ALTER TABLE `seminar`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `proposal_id` (`proposal_id`);
+  ADD KEY `seminar_ibfk_1` (`proposal_id`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -241,13 +245,13 @@ ALTER TABLE `admin`
 -- AUTO_INCREMENT for table `pembimbing`
 --
 ALTER TABLE `pembimbing`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `penguji`
 --
 ALTER TABLE `penguji`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `proposal`
@@ -259,7 +263,7 @@ ALTER TABLE `proposal`
 -- AUTO_INCREMENT for table `seminar`
 --
 ALTER TABLE `seminar`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- Constraints for dumped tables
@@ -269,27 +273,27 @@ ALTER TABLE `seminar`
 -- Constraints for table `pembimbing`
 --
 ALTER TABLE `pembimbing`
-  ADD CONSTRAINT `pembimbing_ibfk_1` FOREIGN KEY (`proposal_id`) REFERENCES `proposal` (`id`),
-  ADD CONSTRAINT `pembimbing_ibfk_2` FOREIGN KEY (`nip`) REFERENCES `dosen` (`nip`);
+  ADD CONSTRAINT `pembimbing_ibfk_1` FOREIGN KEY (`proposal_id`) REFERENCES `proposal` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `pembimbing_ibfk_2` FOREIGN KEY (`nip`) REFERENCES `dosen` (`nip`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `penguji`
 --
 ALTER TABLE `penguji`
-  ADD CONSTRAINT `penguji_ibfk_1` FOREIGN KEY (`seminar_id`) REFERENCES `seminar` (`id`),
-  ADD CONSTRAINT `penguji_ibfk_2` FOREIGN KEY (`nip`) REFERENCES `dosen` (`nip`);
+  ADD CONSTRAINT `penguji_ibfk_1` FOREIGN KEY (`seminar_id`) REFERENCES `seminar` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `penguji_ibfk_2` FOREIGN KEY (`nip`) REFERENCES `dosen` (`nip`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `proposal`
 --
 ALTER TABLE `proposal`
-  ADD CONSTRAINT `proposal_ibfk_1` FOREIGN KEY (`nim`) REFERENCES `mahasiswa` (`nim`);
+  ADD CONSTRAINT `proposal_ibfk_1` FOREIGN KEY (`nim`) REFERENCES `mahasiswa` (`nim`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `seminar`
 --
 ALTER TABLE `seminar`
-  ADD CONSTRAINT `seminar_ibfk_1` FOREIGN KEY (`proposal_id`) REFERENCES `proposal` (`id`);
+  ADD CONSTRAINT `seminar_ibfk_1` FOREIGN KEY (`proposal_id`) REFERENCES `proposal` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
